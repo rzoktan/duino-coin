@@ -41,9 +41,15 @@ using namespace experimental::crypto;
 #include <Ticker.h>
 
 namespace {
-const char* SSID          =  "WIFI SSID";    // Change this to your WiFi name
-const char* PASSWORD      =  "WIFI PASS";    // Change this to your WiFi password
-const char* USERNAME      =  "DUCO USERNAME";// Change this to your Duino-Coin username
+//  new scrypt for wifi configuration
+const int wifiCount = 3;
+const char* wifiSSID[] = { "ssid_1", "ssid_2", "ssid_3" };
+const char* wifiPASS[] = { "pass_1", "pass_2", "pass_3" };
+  
+// const char* SSID           =  "WIFI SSID";    // Change this to your WiFi name
+// const char* PASSWORD       =  "WIFI PASS";    // Change this to your WiFi password
+  
+const char* USERNAME       =  "DUCO USERNAME";// Change this to your Duino-Coin username
 const char* RIG_IDENTIFIER = "None";         // Change this if you want a custom miner name (or use Auto to autogenerate)
 const bool USE_HIGHER_DIFF = false;          // Change to true if using 160 MHz to not get the first share rejected
 
@@ -139,25 +145,42 @@ unsigned long lwdTimeOutMillis = LWD_TIMEOUT;
 #define BLINK_RESET_DEVICE   5
 
 void SetupWifi() {
-  Serial.println("Connecting to: " + String(SSID));
-  WiFi.mode(WIFI_STA); // Setup ESP in client mode
-  WiFi.setSleepMode(WIFI_NONE_SLEEP);
-  WiFi.begin(SSID, PASSWORD);
+  String ssid_conected = "";
+  for (int i = 0; i < wifiCount; i++) {
+    Serial.println("Connecting to: " + String(SSID[i]));
+    WiFi.mode(WIFI_STA); // Setup ESP in client mode
+    WiFi.setSleepMode(WIFI_NONE_SLEEP);
+    WiFi.begin(wifiSSID[i], wifiPASS[i]);
 
-  int wait_passes = 0;
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    if (++wait_passes >= 10) {
-      WiFi.begin(SSID, PASSWORD);
-      wait_passes = 0;
-    }
+    //   int wait_passes = 0;
+    //   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
+    //     delay(500);
+    //     Serial.print(".");
+    //     if (++wait_passes >= 10) {
+    //       WiFi.begin(SSID, PASSWORD);
+    //       wait_passes = 0;
+    //     }
+    //   }
+
+    //   Serial.println("\nConnected to WiFi!");
+    //   Serial.println("    IP address: " + WiFi.localIP().toString());
+    //   Serial.println("      Rig name: " + String(RIG_IDENTIFIER));
+    
+    //  new scrypt for wifi configuration, and ols sc on comment
+   if(WiFi.waitForConnectResult() = WL_CONNECTED){
+     ssid_conected = wifiSSID[i]
+     break;
+   }else{
+     Serial.println("\nWifi not exist, on this network area");
+     Serial.println("\nPlease check your input wifi data!");
+   }
   }
-
+  
   Serial.println("\nConnected to WiFi!");
+  Serial.println("    Wifi Connected: " + ssid_conected);
   Serial.println("    IP address: " + WiFi.localIP().toString());
   Serial.println("      Rig name: " + String(RIG_IDENTIFIER));
-
+  
   UpdatePool();
 }
 
